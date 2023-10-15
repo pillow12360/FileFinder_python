@@ -71,16 +71,22 @@ for f in glob.glob(f'test_folder/{start_str}*.txt'):
 
 import os
 
+print("한동찬 파일 내용 찾기 프로그램")
+
 target_directory = input('검색할 디렉터리명 입력 : ')
 
-target_word = input("파일내 찾고자하는 키워드 입력 : ")
+target_word = input("찾고자하는 키워드 입력 : ")
 
-for (path, dir, files) in os.walk(target_directory):
+def finder(target_directory, target_word):
+  count = 0
+  find_list = []
+
+  for (path, dir, files) in os.walk(target_directory):
     # 경로
     # 경로 내 디렉터리 리스트
     # files : 해당디렉터리의 파일
     # print(path, dir, files)
-
+    
     for filename in files:
         # print(path+os.sep+filename)
         with open(path+os.sep+filename, 'r', encoding='UTF8') as f:# 인코딩 utf8로 지정하지 않으면 한글이 깨짐
@@ -88,9 +94,29 @@ for (path, dir, files) in os.walk(target_directory):
         # with, f를 활용하여 자동으로 close
             try: 
                 if target_word in f: # 파일에 내용이 포함되어 있으면
-                  print("--------------------------")
-                  print(f"{filename}파일에 해당 {target_word}내용이 포함되어 있습니다.")
-                  
+                  # print("-----------------------------------------------------------------")
+                  # print(f"'{filename}'파일에 해당 '{target_word}' 내용이 포함되어 있습니다.")
+                  count += 1
+                  find_list.append(filename)
+
             except: # 파일의 내용을 탐색할 수 없다면
                 pass
+        if count == 0:
+          return print("해당 내용이 포함되어있는 파일이 존재하지 않습니다.")
 
+  print(f'총 {count}개의 파일을 찾았습니다.')
+  print("찾은 파일 이름 리스트 출력")
+  for name in find_list:
+    print(name)
+
+
+
+
+print("1. 파일 내용 찾기")
+print("원하는 기능의 번호를 입력해주세요 : ",end="")
+user_choice = int(input())
+
+if user_choice == 1:
+  finder(target_directory, target_word)
+else:
+  print("프로그램 종료")
