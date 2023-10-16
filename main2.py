@@ -7,6 +7,7 @@ import hashlib
 import os
 import json
 
+
 def produce_file():
     file_name = input("파일명을 입력하세요 : ")
     tags_input = input("태그를 입력하세요 (띄어쓰기 구분): ")
@@ -36,41 +37,61 @@ def hash_find(filepath, blocksize=8192):
         sha_1.update(buf)
     return sha_1.hexdigest()
 
-def content_finder(target_directory, target_word):
+def content_finder():
+  target_content = input("검색할 내용을 입력하세요 : ")
+  target_content = target_content.strip()
+
+  files = [f for f in os.listdir('.') if os.path.isfile(f) and f.endswith('.json')]
+
+  matching_files = []
   count = 0
-  find_list = []
 
-  for (path, dir, files) in os.walk(target_directory):
-    # 경로
-    # 경로 내 디렉터리 리스트
-    # files : 해당디렉터리의 파일
-    # print(path, dir, files)
-    
-    for filename in files:
-        # print(path+os.sep+filename)
-        with open(path+os.sep+filename, 'r', encoding='UTF8') as f:# 인코딩 utf8로 지정하지 않으면 한글이 깨짐
-        # os.sep은 경로구분자 \
-        # with, f를 활용하여 자동으로 close
-            try: 
-                if target_word in f: # 파일에 내용이 포함되어 있으면
-                  # print("-----------------------------------------------------------------")
-                  # print(f"'{filename}'파일에 해당 '{target_word}' 내용이 포함되어 있습니다.")
-                  count += 1
-                  find_list.append(filename)
+  for file_name in files:
+        with open(file_name, 'r') as file:
+            file_data = json.load(file)
+            content = file_data.get('content', [])
+            if target_content in content:
+                matching_files.append(file_name)
+                count += 1
 
-            except: # 파일의 내용을 탐색할 수 없다면
-                pass
-        if count == 0:
-          return print("해당 내용이 포함되어있는 파일이 존재하지 않습니다.")
-  print(f'총 {count}개의 파일을 찾았습니다.')
-  print("찾은 파일 이름 리스트 출력")
-  for name in find_list:
-    print(name)
+  if matching_files:
+        print(f"태그 '{target_content}'와 관련된 파일 목록:")
+        for matched_file in matching_files:
+            print(f'총 {count}개의 파일을 찾았습니다.')
+            print("찾은 파일 리스트")
+            print(matched_file)
+
+  else:
+        print(f"태그 '{target_content}'와 관련된 파일이 없습니다.")
 
 def tag_finder():
-  target_tag = input("찾을 태그를 입력하세요 : ")
 
-  pass
+  target_tag = input("찾을 태그를 입력하세요 : ")
+  target_tag = target_tag.strip()
+
+  files = [f for f in os.listdir('.') if os.path.isfile(f) and f.endswith('.json')]
+
+  matching_files = []
+  count = 0
+
+  for file_name in files:
+        with open(file_name, 'r') as file:
+            file_data = json.load(file)
+            tags = file_data.get('tags', [])
+            if target_tag in tags:
+                matching_files.append(file_name)
+                count += 1
+
+
+  if matching_files:
+        print(f"태그 '{target_tag}'와 관련된 파일 목록:")
+        for matched_file in matching_files:
+            print(f'총 {count}개의 파일을 찾았습니다.')
+            print("찾은 파일 리스트")
+            print(matched_file)
+
+  else:
+        print(f"태그 '{target_tag}'와 관련된 파일이 없습니다.")
 
 
 
@@ -85,14 +106,13 @@ while True:
 
   if choice == 1:
     produce_file()
+    
   elif choice == 2:
     find = input("해시 값을 찾을 파일의 이름 : ")
     print(hash_find(find))
-  
+
   elif choice == 3:
-    dir = "C:/Users/ehdck/Desktop/FileFinder_python"
-    tag = input("검색할 내용(콘텐츠) 입력 : ")
-    content_finder(dir,tag)
+    content_finder()
 
   elif choice == 4:
     tag_finder()
